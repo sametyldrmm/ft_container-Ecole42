@@ -12,20 +12,18 @@ public:
     typedef Allocator   allocator_type;
     typedef typename allocator_type::reference reference;
     typedef typename allocator_type::pointer pointer;
-    
-    // I dont understand
-    std::size_t     size_type; 
-    std::ptrdiff_t  difference_type;
-    
+    typedef typename allocator_type::size_type size_type;
+    typedef typename allocator_type::difference_type difference_type;
+private:
+	allocator_type  _alloc;
+	pointer         _start;
+	pointer         _end;
+	pointer         _end_capacity;
 public:
-    vector()
-    {
-        Allocator b;
-        std::cout << sizeof(allocator_type) << "\n" << sizeof(value_type) << "\n";
-        pointer *s;
-        std::cout << &s;
-    }
-    ~vector()
-    {
-    }
+        explicit vector (const allocator_type& alloc = allocator_type()){}
+        explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()){}
+        template <class InputIterator>         
+        vector (InputIterator first, InputIterator last,const allocator_type& alloc = allocator_type()){}
+        vector (const vector& x){}
+        ~vector(){}
 };
