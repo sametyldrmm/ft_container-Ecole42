@@ -45,6 +45,7 @@
 #include"vector.hpp"
 int main()
 {
-    vector<char> a;
+    vector<int> a;
+    a.push_back(12);
     // a.pri();
 }
