@@ -46,6 +46,12 @@
 int main()
 {
     vector<int> a;
+    std::cout << a.empty() << "\n\n";
+    std::cout << "size=" << a.size() <<"\n";
     a.push_back(12);
+    std::cout << "size=" << a.size() <<"\n";
+    std::cout << "max_size" << a.max_size() << "\n";
+    std::cout << a.empty() << "\n\n";
+
     // a.pri();
 }
