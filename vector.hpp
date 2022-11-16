@@ -8,6 +8,8 @@
 # include <algorithm>
 # include <cstddef>
 # include <tgmath.h>
+# include "random_acces_iterator.hpp"
+#include "utils.hpp"
 
 template < typename T, typename Allocator = std::allocator<T> >
 class vector
@@ -21,6 +23,12 @@ public:
     typedef typename allocator_type::const_pointer const_pointer;
     typedef typename allocator_type::size_type size_type;
     typedef typename allocator_type::difference_type difference_type;
+
+    typedef ft::random_access_iterator<pointer, vector> iterator;
+    typedef ft::random_access_iterator<const_pointer, vector> const_iterator;
+    typedef ft::reverse_iterator<iterator> reverse_iterator;
+    typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+			
 private:
 	allocator_type  _alloc;
 	pointer         _start;
@@ -42,8 +50,8 @@ public://   Capacity
 			size_type prev_size = this->size();
 			size_type prev_capacity = this->capacity();
 			
-			_start = _alloc.allocate( n );
-			_end_capacity = _start + n;
+			_start = _alloc.allocate( new_cap );
+			_end_capacity = _start + new_cap;
 			_end = _start;
 			while (prev_start != prev_end)
 			{
@@ -55,6 +63,7 @@ public://   Capacity
         }
     }
 private: //utils
+
 	void checkRange(const size_type& n) const
 	{
 		if (n >= this->size())
