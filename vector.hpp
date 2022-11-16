@@ -86,6 +86,29 @@ public://Element access
 	const_reference back () const { return (*(_end - 1)); }
     pointer data(){    return _start;}
     const_pointer data() const{    return _start;}
+public: //iterator
+    iterator begin(){return (_start);   }
+    const_iterator begin() const {return (_start);}
+    
+    iterator end()
+    {
+    	if (this->empty())
+			return (this->begin());
+	    return (_end);
+    }
+    const_iterator end() const
+    {
+    	if (this->empty())
+			return (this->begin());
+	    return (_end);
+    }
+    
+    reverse_iterator rbegin() {return (reverse_iterator(this->end())); }
+    const_reverse_iterator rbegin() const {return (reverse_iterator(this->end())); }
+    
+    reverse_iterator rend() { return (reverse_iterator(this->begin())); }
+    const_reverse_iterator rend() const { return (reverse_iterator(this->begin())); }
+
 public:
         explicit vector (const allocator_type& alloc = allocator_type())
         {
