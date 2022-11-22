@@ -42,16 +42,47 @@
 //     return 0;
 // }
 #include<iostream>
-#include"vector.hpp"
+// #include"vector.hpp"
+#include<vector>
 int main()
 {
-    vector<int> a;
-    std::cout << a.empty() << "\n\n";
-    std::cout << "size=" << a.size() <<"\n";
-    a.push_back(12);
-    std::cout << "size=" << a.size() <<"\n";
-    std::cout << "max_size" << a.max_size() << "\n";
-    std::cout << a.empty() << "\n\n";
+    // std::vector<int> a;
+    // a.push_back(12);
+    // a.push_back(12);
+    // a.push_back(12);
+    // a.push_back(12);
+    // a.push_back(12);
+    // std::vector<int> b;
 
-    // a.pri();
+    // b.insert(b.begin(),a.begin(),a.end());
+    // std::cout << b.capacity() << "\n"; 
+    // b.push_back(122);
+    // std::cout << b.capacity() << "\n";
+    // b.push_back(122);
+    // b.push_back(122);
+    // b.push_back(122);
+    // b.push_back(122);
+    // b.push_back(122);
+
+    // std::cout << b.capacity() << "\n";
+    // std::cout << b.size() << "\n";
+    // // a.pri();
+
+    std::vector<int> first;
+    std::vector<int> second;
+    std::vector<int> third;
+
+    first.assign (7,100);             // 7 ints with a value of 100
+    for (size_t i = 0; i < 10; i++)
+    {
+        std::cout << first[i] << "\n";
+    }
+
+    first.assign (3,300);             // 7 ints with a value of 100
+
+    for (size_t i = 0; i < 10; i++)
+    {
+        std::cout << first[i] << "\n";
+    }
+    std::cout << first.size();
 }

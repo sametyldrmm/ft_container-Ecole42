@@ -3,7 +3,24 @@
 
 #include<iostream>
 #include<string>
+#include<sstream>
 
+const // It is a const object...
+class nullptr_t 
+{
+  public:
+    template<class T>
+    inline operator T*() const // convertible to any type of null non-member pointer...
+    { return 0; }
+
+    template<class C, class T>
+    inline operator T C::*() const   // or any type of null member pointer...
+    { return 0; }
+
+  private:
+    void operator&() const;  // Can't take address of nullptr
+
+} nullptr = {};
 
 namespace ft {
 template <typename T>
@@ -15,7 +32,7 @@ std::string to_string(T n)
     return (ss.str());
 }
 
-template <bool B, typename T = void>
+    template <bool B, typename T = void>
     struct enable_if
     {
     };
@@ -102,6 +119,20 @@ template <bool B, typename T = void>
     struct is_same<T, T> : public true_type
     {
     };
+    template <class InputIterator1, class InputIterator2>
+        bool lexicographical_compare (InputIterator1 first1, InputIterator1 last1,
+                                        InputIterator2 first2, InputIterator2 last2)
+        {
+            while (first1 != last1)
+            {
+                if (first2 == last2 || *first2 < *first1) return false;
+                else if (*first1 < *first2) return true;
+                ++first1;
+                ++first2;
+            }
+            return (first2 != last2);
+        }
+
 
 }
 #endif
