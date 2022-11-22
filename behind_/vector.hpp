@@ -10,10 +10,8 @@
 # include <tgmath.h>
 # include "random_acces_iterator.hpp"
 #include "utils.hpp"
-
 namespace ft
 {
-
 template < typename T, typename Allocator = std::allocator<T> >
 class vector
 {
@@ -32,7 +30,6 @@ public:
     typedef ft::reverse_iterator<iterator> reverse_iterator;
     typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
     typedef typename ft::iterator_traits<iterator>::difference_type    difference_type;  
-			
 private:
 	allocator_type  _alloc;
 	pointer         _start;
@@ -75,15 +72,6 @@ private: //utils
 					+ ft::to_string(n) + ") >= this->size() (which is "
 					+ ft::to_string(this->size()) + ")"));
 	}
-    // void clear()
-	// {
-	// 	size_type save_size = this->size();
-	// 	for (size_type i = 0; i < save_size; i++)
-	// 	{
-	// 		_end--;
-	// 		_alloc.destroy(_end);
-	// 	}
-	// }
 
 public://Element access
     reference at (size_type n) {
@@ -115,7 +103,7 @@ public: //iterator
     {
     	if (this->empty())
 			return (this->begin());
-	    return (_end);
+	    return ((const_iterator)_end);
     }
 
     reverse_iterator rbegin() {return (reverse_iterator(this->end())); }
@@ -159,6 +147,7 @@ public: // construct vecotr
         }
         vector (const vector& x) :_alloc(x._alloc),_start(nullptr),_end(nullptr),_end_capacity(nullptr)
         {
+			this->insert(this->begin(), x.begin(), x.end());
             //insert gelicek
         }
         ~vector()
@@ -175,11 +164,17 @@ public:
 			int next_capacity = (this->size() > 0) ? (int)(this->size() * 2) : 1;
 			this->reserve(next_capacity);
 		}
-		_alloc.construct(_end, val);
+		_alloc.construct(_end, a);
 		_end++;
     }
-
-    void assign (size_type n, const value_type& val)
+	
+	void pop_back()
+	{
+		_alloc.destroy(&this->back());
+		_end--;
+	}
+    
+	void assign (size_type n, const value_type& val)
     {
         this->clear();
 	    if (n == 0)
@@ -234,104 +229,139 @@ public:
     }
 
     // single element (1)	
-    iterator insert (iterator position, const value_type& val)
-    {
-    	size_type pos_len = position - _start;
-		if (size_type(_end_capacity - _end) >= this->size() + 1)
-		{
-			for (size_type i = 0; i < pos_len; i++)
-				_alloc.construct(_end - i, *(_end - i - 1));
-			_end++;
-			_alloc.construct(position, val);
-		}
-		else
-		{
-			pointer new_start = pointer();
-			pointer new_end = pointer();
-			pointer new_end_capacity = pointer();
-			int next_capacity = (this->size() * 2 > 0) ? this->size() * 2 : 1; 
-			new_start = _alloc.allocate( next_capacity );
-			new_end = new_start + this->size() + 1;
-			new_end_capacity = new_start + next_capacity;
-			for (size_type i = 0; i < pos_len; i++)
-				_alloc.construct(new_start + i, *(_start + i));
-			_alloc.construct(new_start + pos_len, val);
-			for (size_type j = 0; j < this->size() - pos_len; j++)
-				_alloc.construct(new_end - j - 1, *(_end - j - 1));
-			for (size_type l = 0; l < this->size(); l++)
-				_alloc.destroy(_start + l);
-			if (_start)
-				_alloc.deallocate(_start, this->capacity());
+			iterator insert (iterator position, const value_type& val)
+			{
+				size_type pos_len = &(*position) - _start;
+				if (size_type(_end_capacity - _end) >= this->size() + 1)
+				{
+					for (size_type i = 0; i < pos_len; i++)
+						_alloc.construct(_end - i, *(_end - i - 1));
+					_end++;
+					_alloc.construct(&(*position), val);
+				}
+				else
+				{
+					pointer new_start = pointer();
+					pointer new_end = pointer();
+					pointer new_end_capacity = pointer();
 
-			_start = new_start;
-			_end = new_end;
-			_end_capacity = new_end_capacity;
-		}
-		return (iterator(_start + pos_len));
-    }
-    void insert (iterator position, size_type n, const value_type& val)
-    {
-        if (n == 0)
-	    	return ;
-	    if (n > this->max_size())
-	    	throw (std::length_error("vector::insert (fill)"));
-	    size_type pos_len = position - _start;
-	    if (size_type(_end_capacity - _end) >= n)
-	    {
-	    	for (size_type i = 0; i < this->size() - pos_len; i++)
-	    		_alloc.construct(_end - i + (n - 1), *(_end - i - 1));
-	    	_end += n;
-	    	while (n)
-	    	{
-	    		_alloc.construct(position) + (n - 1), val);
-	    		n--;
-	    	}
-	    }
-	    else
-	    {
-	    	pointer new_start = pointer();
-	    	pointer new_end = pointer();
-	    	pointer new_end_capacity = pointer();
-    
-	    	int next_capacity = (this->capacity() > 0) ? (int)(this->size() * 2) : 1;
-	    	new_start = _alloc.allocate(next_capacity);
-	    	new_end_capacity = new_start + next_capacity;
-	    	if (size_type(new_end_capacity - new_start) < this->size() + n)
-	    	{
-	    		if (new_start)
-	    			_alloc.deallocate(new_start, new_start - new_end_capacity);
-	    		next_capacity = this->size() + n;
-	    		new_start = _alloc.allocate(next_capacity);
-	    		new_end = new_start + this->size() + n;
-	    		new_end_capacity = new_start + next_capacity;
-	    	}
-	    	new_end = new_start + this->size() + n;
-	    	for (int i = 0; i < (position) - _start); i++)
-	    		_alloc.construct(new_start + i, *(_start + i));
-	    	for (size_type k = 0; k < n; k++)
-	    		_alloc.construct(new_start + pos_len + k, val);
-	    	for (size_type j = 0; j < (this->size() - pos_len); j++)
-	    		_alloc.construct(new_end - j - 1, *(_end - j - 1));
-	    	for (size_type u = 0; u < this->size(); u++)
-	    		_alloc.destroy(_start + u);
-	    	_alloc.deallocate(_start, this->capacity());
-	    	_start = new_start;
-	    	_end = new_end;
-	    	_end_capacity = new_end_capacity;
-	    }
-    }
+					int next_capacity = (this->size() * 2 > 0) ? this->size() * 2 : 1; 
+					new_start = _alloc.allocate( next_capacity );
+					new_end = new_start + this->size() + 1;
+					new_end_capacity = new_start + next_capacity;
 
+					for (size_type i = 0; i < pos_len; i++)
+						_alloc.construct(new_start + i, *(_start + i));
+					_alloc.construct(new_start + pos_len, val);
+					for (size_type j = 0; j < this->size() - pos_len; j++)
+						_alloc.construct(new_end - j - 1, *(_end - j - 1));
 
-    template <class InputIterator>    void insert (iterator position, InputIterator first, InputIterator last)
-    {
-				size_type dist = std::distance(first, last);
+					for (size_type l = 0; l < this->size(); l++)
+						_alloc.destroy(_start + l);
+					if (_start)
+						_alloc.deallocate(_start, this->capacity());
+					
+					_start = new_start;
+					_end = new_end;
+					_end_capacity = new_end_capacity;
+				}
+				return (iterator(_start + pos_len));
+			}
+
+			/*
+			** @brief Insert an element a "n" amount of time
+			** before the specified position. Can ecrease de capacity
+			** of the container. This action force the container to
+			** realocate all the elements that were after "position"
+			** to their new positions.
+			**
+			** @param position The position where insert.
+			** @param n Amout of element to insert.
+			** @param val The element to insert.
+			*/
+			void insert (iterator position, size_type n, const value_type& val)
+			{
+				if (n == 0)
+					return ;
+				if (n > this->max_size())
+					throw (std::length_error("vector::insert (fill)"));
+				size_type pos_len = &(*position) - _start;
+				if (size_type(_end_capacity - _end) >= n)
+				{
+					for (size_type i = 0; i < this->size() - pos_len; i++)
+						_alloc.construct(_end - i + (n - 1), *(_end - i - 1));
+					_end += n;
+					while (n)
+					{
+						_alloc.construct(&(*position) + (n - 1), val);
+						n--;
+					}
+				}
+				else
+				{
+					pointer new_start = pointer();
+					pointer new_end = pointer();
+					pointer new_end_capacity = pointer();
+					
+					int next_capacity = (this->capacity() > 0) ? (int)(this->size() * 2) : 1;
+					new_start = _alloc.allocate(next_capacity);
+					new_end_capacity = new_start + next_capacity;
+
+					if (size_type(new_end_capacity - new_start) < this->size() + n)
+					{
+						if (new_start)
+							_alloc.deallocate(new_start, new_start - new_end_capacity);
+						next_capacity = this->size() + n;
+						new_start = _alloc.allocate(next_capacity);
+						new_end = new_start + this->size() + n;
+						new_end_capacity = new_start + next_capacity;
+					}
+
+					new_end = new_start + this->size() + n;
+
+					for (int i = 0; i < (&(*position) - _start); i++)
+						_alloc.construct(new_start + i, *(_start + i));
+					for (size_type k = 0; k < n; k++)
+						_alloc.construct(new_start + pos_len + k, val);
+					for (size_type j = 0; j < (this->size() - pos_len); j++)
+						_alloc.construct(new_end - j - 1, *(_end - j - 1));
+
+					for (size_type u = 0; u < this->size(); u++)
+						_alloc.destroy(_start + u);
+					_alloc.deallocate(_start, this->capacity());
+
+					_start = new_start;
+					_end = new_end;
+					_end_capacity = new_end_capacity;
+				}
+			}
+
+			/*
+			** @brief Insert element in range from ["first" to
+			** "last") at "position". Can increase the capacity of
+			** the container. Throw if the iterator given is not valid.
+			** Reallocate all elements after the dist between first and last.
+			**
+			** @param position the position where insert.
+			** @param first the first element in the range.
+			** @param last the last element in the range.
+			*/
+			template <class InputIterator>
+				void insert (iterator position, InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = u_nullptr)
+			{
+				bool is_valid;
+				if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::value))
+					throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
+				
+				size_type dist = ft::distance(first, last);
 				if (size_type(_end_capacity - _end) >= dist)
 				{
-					for(size_type i = 0; i < this->size() - (position - _start); i++)
+					for(size_type i = 0; i < this->size() - (&(*position) - _start); i++)
 						_alloc.construct(_end - i + (dist - 1), *(_end - i - 1));
 					_end += dist;
-					for (; first != last); first++, position++)
-						_alloc.construct(position, *first);
+					for (; &(*first) != &(*last); first++, position++)
+						_alloc.construct(&(*position), *first);
 				}
 				else
 				{
@@ -352,12 +382,12 @@ public:
 						new_end_capacity = new_end;
 					}
 
-					for (int i = 0; i < position - _start; i++)
+					for (int i = 0; i < &(*position) - _start; i++)
 						_alloc.construct(new_start + i, *(_start + i));
-					for (int j = 0; first != last; first++, j++)
-						_alloc.construct(new_start + (position - _start) + j, *first);
-					for (size_type k = 0; k < this->size() - (position - _start); k++)
-                        _alloc.construct(new_start + (*(&position) - _start) + dist + k, *(position + k));
+					for (int j = 0; &(*first) != &(*last); first++, j++)
+						_alloc.construct(new_start + (&(*position) - _start) + j, *first);
+					for (size_type k = 0; k < this->size() - (&(*position) - _start); k++)
+						_alloc.construct(new_start + (&(*position) - _start) + dist + k, *(_start + (&(*position) - _start) + k));
 
 					for (size_type l = 0; l < this->size(); l++)
 						_alloc.destroy(_start + l);
@@ -367,11 +397,12 @@ public:
 					_end = new_end;
 					_end_capacity = new_end_capacity;
 				}
-    }
-    
-    iterator erase (iterator position);iterator erase (iterator first, iterator last)
-    {
-        pointer p_pos = position;
+			} 
+    iterator erase (iterator position)    
+	{
+        pointer p_pos = pointer();
+
+		p_pos = position;
 		_alloc.destroy(position);
 		if (position + 1 == _end)
 			_alloc.destroy(position);
@@ -386,6 +417,7 @@ public:
 		_end -= 1;
 		return (iterator(p_pos));
     }
+	iterator erase (iterator first, iterator last) {} // EKSİK
 
     void swap (vector& x)
     {
@@ -416,109 +448,76 @@ public:
 			_alloc.destroy(_end);
 		}
     }
-    //operator
-    	template <class T, class Alloc>
-		bool operator== (const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+	void        resize (size_type n, value_type val = value_type())
+	{
+		if (n > this->max_size())
+			throw (std::length_error("vector::resize"));
+		else if (n < this->size())
 		{
-			if (lhs.size() != rhs.size())
-				return (false);
-			typename ft::vector<T>::const_iterator first1 = lhs.begin();
-			typename ft::vector<T>::const_iterator first2 = rhs.begin();
-			while (first1 != lhs.end())
+			while (this->size() > n)
 			{
-				if (first2 == rhs.end() || *first1 != *first2)
-					return (false);
-				++first1;
-				++first2;
+				--_end;
+				_alloc.destroy(_end);
 			}
-			return (true);
 		}
+		else
+			this->insert(this->end(), n - this->size(), val);
+	}
 
-        template <class T, class Alloc>
-		bool operator!= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
-		{
-			return (!(lhs == rhs));
-		}
+    allocator_type get_allocator() const
+    {
+        return _alloc;
+    }
+	reference operator[] (size_type n) { return (*(_start + n)); }
+	const_reference operator[] (size_type n) const { return (*(_start + n)); }
 
-        template <class T, class Alloc>
-		bool operator<  (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
-		{
-			return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-		} // dikkat
-
-        template <class T, class Alloc>
-		bool operator<= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
-		{
-			return (!(rhs < lhs));
-		}
-
-        template <class T, class Alloc>
-		bool operator>  (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
-		{
-			return (rhs < lhs);
-		}
-
-        template <class T, class Alloc>
-		bool operator>= (const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs)
-		{
-			return (!(lhs < rhs));
-		}
-
-        template <class T, class Alloc>
-		void swap (vector<T,Alloc>& x, vector<T,Alloc>&y)
-		{
-			x.swap(y);
-		}
-        
-        allocator_type get_allocator() const
-        {
-            return _alloc;
-        }
 };
-
+    //operator
+	template <class U, class Alloc>
+	bool operator== (const ft::vector<U, Alloc>& lhs, const ft::vector<U, Alloc>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return (false);
+		typename ft::vector<U>::const_iterator first1 = lhs.begin();
+		typename ft::vector<U>::const_iterator first2 = rhs.begin();
+		while (first1 != lhs.end())
+		{
+			if (first2 == rhs.end() || *first1 != *first2)
+				return (false);
+			++first1;
+			++first2;
+		}
+		return (true);
+	}
+    template <class U, class Alloc>
+	bool operator<  (const vector<U, Alloc>& lhs, const vector<U, Alloc>& rhs)
+	{
+		return (ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+	} 
+    template <class U, class Alloc>
+	bool operator<= (const vector<U, Alloc>& lhs, const vector<U, Alloc>& rhs)
+	{
+		return (!(rhs < lhs));
+	}
+    template <class U, class Alloc>
+	bool operator>  (const vector<U, Alloc>& lhs, const vector<U, Alloc>& rhs)
+	{
+		return (rhs < lhs);
+	}
+    template <class U, class Alloc>
+	bool operator>= (const vector<U, Alloc>& lhs, const vector<U, Alloc>& rhs)
+	{
+		return (!(lhs < rhs));
+	}
+    template <class u, class Alloc_>
+	bool operator!= (const ft::vector<u, Alloc_>& lhs, const ft::vector<u, Alloc_>& rhs)
+	{
+			return (!(lhs == rhs));
+	}
+    template <class U, class Alloc>
+	void swap (vector<U,Alloc>& x, vector<U,Alloc>&y)
+	{
+		x.swap(y);
+	}
 }
-// şimdi nasıl yapıcaz bir düşünelim 3 tür insert var
-// bu yazacağımız copy fonksiyonu ona uygun olursa bizim için iyi olur diye düşünüyorum
-// push_backin tek versiyonu olması bu dediğimin boş bir şey olduğunu gösteriyor olabilir
-// ve inserti yapmak için iterator kullanmalıyız en azından iteratorı yapmalıyız gibi duruyor
-// iteratorın neyini yapıcaz bilmiyorum
-// bu bir problem
-// kafamdaki yapı şu şekilde
-
-// push_back için sonuna kadar kopyalayıp fazladan 1 yer vermem yeterli o son yeri push_backtede doldurabilirim
-
-// iterator insert (iterator position, const value_type& val);
-// void insert (iterator position, size_type n, const value_type& val);
-// template <class InputIterator>    void insert (iterator position, InputIterator first, InputIterator last);
-    // insertte olay biraz daha farklı
-    // burada 3 tür insert görüyoruz mantıkları aynı olsada biraz farklılar
-    // burada yapılması gereken şey ise şu
-    // yeni gelen değer yada değerlerin boyutunu bul
-        // boyutunu oluştururken elindeki değerlerin sayısı + yeni sayıların sayısı kadar yer aç
-            // istenilen yere kadar kopyala 
-            // yeni verilen sayıları sırasıyla kopyala
-            // eskiden kaldığın yerden itibaren sonuna kadar kopyala
-
-            //EXAMPLE    
-            // 10 sayılık vectorum var insertle 3.konuma 5 sayı gelecek
-                // 5sayıyı nasıl bulabiliriz 
-                    // eğer tek sayı ise direk bilicem
-                    // eğer dizi ise size muhtemelen verir
-                    // eğer iterator ise iterator farkı bana sayıyıy verir
-            // 15 sayılık yer açtım
-            // ilk 3 sayımı kopyaladım
-                // İKTİMALLER 3 adet
-                    //TEK SAYI 1->iktimal
-                        // sayıyı direk ekle
-                    //BİRDEN FAZLA SAYI 2-iktimal
-                        // 1) DİZİ 
-                        // 2) İTERATOR aralığı
-                    // yeni sayılarımı kopyaladım
-            // eski 4.sayıdan itibaren 10.sayıya kadar kopyaladım
-    // bu durumlara bakarak bize lazım olan fonksiyonların parametrelerini işimize yarayacak şekilde koyabiliriz diye düşünüyorum 
-    // yada aynı ada sahip birden fazla fonksiyon yapabiliriz kendi türlerine itaat eden
-
-// yeni akıl etmem üzerine farkettiğim bir şey ilk önce capacityy fonksiyonları yazmam daha mantıklı galiba :(
-// deneyim herşeydir bilgi ve deneyim inanılmaz iki karkdeştir unutmucaksın %1 in gücünü dediğini hatırla
-// bu %1 olayına inanmasam intihar ederdim hatta o kadarki ben buna tapıcak kadar inanıyorum
 
