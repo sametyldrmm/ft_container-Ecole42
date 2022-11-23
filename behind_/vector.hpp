@@ -36,10 +36,10 @@ private:
 	pointer         _end;
 	pointer         _end_capacity;
 public://   Capacity
-    bool empty() const {return(_start - _end == 0);}
-    size_type size() const{return(_end - _start);}
-    size_type max_size() const{return(_alloc.max_size());}
-    size_type capacity() const{return(_end_capacity - _start);}
+    bool empty() const { return(const bool(_start - _end == 0));}
+    size_type size() const{return(const size_type(_end - _start));}
+    size_type max_size() const{return(const size_type(_alloc.max_size()));}
+    size_type capacity() const{return(const size_type(_end_capacity - _start));}
     void reserve(size_type new_cap )
     {
         if (new_cap > this->max_size())
