@@ -74,9 +74,14 @@ namespace ft
 		}
 		
 		vector (const vector& x)
-		:_alloc(x._alloc),_start(u_nullptr),_end(u_nullptr),_end_capacity(u_nullptr)
+		:_alloc(x._alloc),_start(nullptr),_end(nullptr),_end_capacity(nullptr)
 		{
 			this->insert(this->begin(), x.begin(), x.end());
+		}
+		~vector()
+		{
+			this->clear();
+			_alloc.deallocate(_start, this->capacity());
 		}
 public://   Capacity
     bool empty() const {return(_start - _end == 0);}
@@ -443,12 +448,6 @@ template <class InputIterator>
 					}
 				}
 			}
-
-
-
-
-
-
 
 //**********************************************
     public: // get_alloc swap relations_operator
