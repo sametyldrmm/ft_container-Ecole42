@@ -268,17 +268,6 @@ public:
 				return (iterator(_start + pos_len));
 			}
 
-			/*
-			** @brief Insert an element a "n" amount of time
-			** before the specified position. Can ecrease de capacity
-			** of the container. This action force the container to
-			** realocate all the elements that were after "position"
-			** to their new positions.
-			**
-			** @param position The position where insert.
-			** @param n Amout of element to insert.
-			** @param val The element to insert.
-			*/
 			void insert (iterator position, size_type n, const value_type& val)
 			{
 				if (n == 0)
