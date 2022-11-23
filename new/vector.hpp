@@ -38,6 +38,46 @@ namespace ft
     public: //constructor
         explicit vector (const allocator_type& alloc = allocator_type())
         :_alloc(alloc), _start(nullptr), _end(nullptr), _end_capacity(nullptr){}
+
+		explicit vector (size_type n, const value_type& val = value_type(),
+			 const allocator_type& alloc = allocator_type())
+		:_alloc(alloc),_start(nullptr),_end(nullptr),_end_capacity(nullptr)
+		{
+			_start = _alloc.allocate( n );
+			_end_capacity = _start + n;
+			_end = _start;
+			while (n--)
+			{
+				_alloc.construct(_end, val);
+				_end++;
+			}
+		}
+		template <class InputIterator>
+				vector (InputIterator first, InputIterator last,
+						const allocator_type& alloc = allocator_type(),
+						typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
+		:_alloc(alloc)
+		{
+			bool is_valid;
+			// if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::value))
+			// 	throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
+			
+			difference_type n = ft::distance(first, last);
+			_start = _alloc.allocate( n );
+			_end_capacity = _start + n;
+			_end = _start;
+			while (n--)
+			{
+				_alloc.construct(_end, *first++);
+				_end++;
+			}
+		}
+		
+		vector (const vector& x)
+		:_alloc(x._alloc),_start(u_nullptr),_end(u_nullptr),_end_capacity(u_nullptr)
+		{
+			this->insert(this->begin(), x.begin(), x.end());
+		}
 public://   Capacity
     bool empty() const {return(_start - _end == 0);}
     size_type size() const{return(_end - _start);}
@@ -479,7 +519,11 @@ template <class InputIterator>
 // adım 8 ) iterator_traits ekle ve reverse_iterator ekle
 //              şimdi bunu yapma şeklimiz şudur typedef ile belirttikten sonra gider dosyamızı oluştururuz
 //              sitelerdeki bilgilere göre dosyamızı doldururuz
-//              yani    adım 1 ) vector dosyasında vector klasına ihtiyacı olan şeyleri ver
+//              yani    
+//						adım 0 ) is_integral ve enable_if SFINAE yap denemesi epey bi zor ama anlaşılır uğraşılmaya değecek bir konu
+//									bu adım fazlasıyla önemli kodları epey kısa doğrudur ama arkalarındaki mantık çok büyük
+//										anladığım kadarıyla enable_if tarzı şeyler kısıtlayıcı ama yok edici değil hata değiller ama onlar sorun var diyorsa vardır :)
+//						adım 1 ) vector dosyasında vector klasına ihtiyacı olan şeyleri ver
 //                      adım 2 ) iterator_traits structlarını oluştur bunlar bilgi bloklarımız olucak
 //                      adım 3 ) reverse_iterator clasını oluştur
 //                      adım 4 ) iterator_traits klasındaki bilgileri gerçek std::iteratorden al
