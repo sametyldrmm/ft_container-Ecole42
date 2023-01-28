@@ -1,7 +1,7 @@
 #include "tester.hpp"
 
 #include <stack>
-
+#include<map>
 int main()
 {
     test_vector();

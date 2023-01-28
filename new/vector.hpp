@@ -52,6 +52,7 @@ namespace ft
 				_end++;
 			}
 		}
+
 		template <class InputIterator>
 				vector (InputIterator first, InputIterator last,
 						const allocator_type& alloc = allocator_type(),
@@ -178,7 +179,7 @@ public://Element access
     {
         if (x == *this)
 		    return;
-			
+
 		pointer save_start = x._start;
 		pointer save_end = x._end;
 		pointer save_end_capacity = x._end_capacity;
@@ -208,7 +209,7 @@ public://Element access
 	iterator insert (iterator position, const value_type& val)
 	{
 		size_type pos_len = &(*position) - _start;
-		
+
 		if (size_type(_end_capacity - _end) >= this->size() + 1)
 		{
 			for (size_type i = 0; i < pos_len; i++)
@@ -296,158 +297,147 @@ public://Element access
 		}
 	}
 
-
-
-
-
-template <class InputIterator>
-				void insert (iterator position, InputIterator first, InputIterator last,
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
-			{
-				bool is_valid;
-				// if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::value))
-				// 	throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
-				
-				size_type dist = ft::distance(first, last);
-				if (size_type(_end_capacity - _end) >= dist)
-				{
-					for(size_type i = 0; i < this->size() - (&(*position) - _start); i++)
-						_alloc.construct(_end - i + (dist - 1), *(_end - i - 1));
-					_end += dist;
-					for (; &(*first) != &(*last); first++, position++)
-						_alloc.construct(&(*position), *first);
-				}
-				else
-				{
-					pointer new_start = pointer();
-					pointer new_end = pointer();
-					pointer new_end_capacity = pointer();
-
-					new_start = _alloc.allocate( this->size() * 2 );
-					new_end = new_start + this->size() + dist;
-					new_end_capacity = new_start + ( this->size() * 2 );
-
-					if (size_type(new_end_capacity - new_start) < this->size() + dist)
-					{
-						if (new_start)
-							_alloc.deallocate(new_start, new_end_capacity - new_start);
-						new_start = _alloc.allocate (this->size() + dist);
-						new_end = new_start + this->size() + dist;
-						new_end_capacity = new_end;
-					}
-
-					for (int i = 0; i < &(*position) - _start; i++)
-						_alloc.construct(new_start + i, *(_start + i));
-					for (int j = 0; &(*first) != &(*last); first++, j++)
-						_alloc.construct(new_start + (&(*position) - _start) + j, *first);
-					for (size_type k = 0; k < this->size() - (&(*position) - _start); k++)
-						_alloc.construct(new_start + (&(*position) - _start) + dist + k, *(_start + (&(*position) - _start) + k));
-
-					for (size_type l = 0; l < this->size(); l++)
-						_alloc.destroy(_start + l);
-					_alloc.deallocate(_start, this->capacity());
-
-					_start = new_start;
-					_end = new_end;
-					_end_capacity = new_end_capacity;
-				}
-			}
-
-
-			iterator erase (iterator position)
-			{
-				pointer p_pos = &(*position);
-				_alloc.destroy(&(*position));
-				if (&(*position) + 1 == _end)
-					_alloc.destroy(&(*position));
-				else
-				{
-					for (int i = 0; i < _end - &(*position) - 1; i++)
-					{
-						_alloc.construct(&(*position) + i, *(&(*position) + i + 1));
-						_alloc.destroy(&(*position) + i + 1);
-					}
-				}
-				_end -= 1;
-				return (iterator(p_pos));
-			}
-
-			iterator erase (iterator first, iterator last)
-			{
-				pointer p_first = &(*first);
-				for (; &(*first) != &(*last); first++)
-					_alloc.destroy(&(*first));
-				for (int i = 0; i < _end - &(*last); i++)
-				{
-					_alloc.construct(p_first + i, *(&(*last) + i));
-					_alloc.destroy(&(*last) + i);
-				}
-				_end -= (&(*last) - p_first);
-				return (iterator(p_first));
-			}
-
-
-			template <class InputIterator>
-				void assign (InputIterator first, InputIterator last,
-				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
-				{
-					bool is_valid;
-					// if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category>::value))
-					// 	throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
-					this->clear();
-					size_type dist = ft::distance(first, last);
-					if (size_type(_end_capacity - _start) >= dist)
-					{
-						for(; &(*first) != &(*last); first++, _end++)
-							_alloc.construct(_end, *first);
-					}
-					else
-					{
-						pointer new_start = pointer();
-						pointer new_end = pointer();
-						pointer new_end_capacity = pointer();
-
-						new_start = _alloc.allocate(dist);
-						new_end = new_start;
-						new_end_capacity = new_start + dist;
-
-						for(; &(*first) != &(*last); first++, new_end++)
-							_alloc.construct(new_end, *first);
-						
-						_alloc.deallocate(_start, this->capacity());
-
-						_start = new_start;
-						_end = new_end;
-						_end_capacity = new_end_capacity;
-					}
-				}
+	template <class InputIterator>
+	void insert (iterator position, InputIterator first, InputIterator last,
+	typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
+	{
+		bool is_valid;
+		// if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::value))
+		// 	throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
 		
-			void assign (size_type n, const value_type& val)
+		size_type dist = ft::distance(first, last);
+		if (size_type(_end_capacity - _end) >= dist)
+		{
+			for(size_type i = 0; i < this->size() - (&(*position) - _start); i++)
+				_alloc.construct(_end - i + (dist - 1), *(_end - i - 1));
+			_end += dist;
+			for (; &(*first) != &(*last); first++, position++)
+				_alloc.construct(&(*position), *first);
+		}
+		else
+		{
+			pointer new_start = pointer();
+			pointer new_end = pointer();
+			pointer new_end_capacity = pointer();
+			pointer new_end_last_capacity;
+
+			
+			new_start = _alloc.allocate( this->size() * 2 );
+			new_end = new_start + this->size() + dist;
+			new_end_capacity = new_start + ( this->size() * 2 );
+			if (size_type(new_end_capacity - new_start) < this->size() + dist)
 			{
-				this->clear();
-				if (n == 0)
-					return ;
-				if (size_type(_end_capacity - _start) >= n)
-				{
-					while (n)
-					{
-						_alloc.construct(_end++ , val);
-						n--;
-					}
-				}
-				else
-				{
-					_alloc.deallocate(_start, this->capacity());
-					_start = _alloc.allocate( n );
-					_end = _start;
-					_end_capacity = _start + n;
-					while (n)
-					{
-						_alloc.construct(_end++, val);
-						n--;
-					}
-				}
+				if (new_start)
+					_alloc.deallocate(new_start, new_end_capacity - new_start);
+				new_start = _alloc.allocate (this->size() + dist);
+				new_end = new_start + this->size() + dist;
+				new_end_capacity = new_end;
 			}
+			for (int i = 0; i < &(*position) - _start; i++)
+				_alloc.construct(new_start + i, *(_start + i));
+			for (int j = 0; &(*first) != &(*last); first++, j++)
+				_alloc.construct(new_start + (&(*position) - _start) + j, *first);
+			for (size_type k = 0; k < this->size() - (&(*position) - _start); k++)
+				_alloc.construct(new_start + (&(*position) - _start) + dist + k, *(_start + (&(*position) - _start) + k));
+			for (size_type l = 0; l < this->size(); l++)
+				_alloc.destroy(_start + l);
+			_alloc.deallocate(_start, this->capacity());
+			_start = new_start;
+			_end = new_end;
+			_end_capacity = new_end_capacity;
+		}
+	}
+
+	iterator erase (iterator position)
+	{
+		pointer p_pos = &(*position);
+		_alloc.destroy(&(*position));
+		if (&(*position) + 1 == _end)
+			_alloc.destroy(&(*position));
+		else
+		{
+			for (int i = 0; i < _end - &(*position) - 1; i++)
+			{
+				_alloc.construct(&(*position) + i, *(&(*position) + i + 1));
+				_alloc.destroy(&(*position) + i + 1);
+			}
+		}
+		_end -= 1;
+		return (iterator(p_pos));
+	}
+
+	iterator erase (iterator first, iterator last)
+	{
+		pointer p_first = &(*first);
+		for (; &(*first) != &(*last); first++)
+			_alloc.destroy(&(*first));
+		for (int i = 0; i < _end - &(*last); i++)
+		{
+			_alloc.construct(p_first + i, *(&(*last) + i));
+			_alloc.destroy(&(*last) + i);
+		}
+		_end -= (&(*last) - p_first);
+		return (iterator(p_first));
+	}
+	
+	template <class InputIterator>
+		void assign (InputIterator first, InputIterator last,
+		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = nullptr)
+		{
+			bool is_valid;
+			// if (!(is_valid = ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category>::value))
+			// 	throw (ft::InvalidIteratorException<typename ft::is_ft_iterator_tagged<typename ft::iterator_traits<InputIterator>::iterator_category >::type>());
+			this->clear();
+			size_type dist = ft::distance(first, last);
+			if (size_type(_end_capacity - _start) >= dist)
+			{
+				for(; &(*first) != &(*last); first++, _end++)
+					_alloc.construct(_end, *first);
+			}
+			else
+			{
+				pointer new_start = pointer();
+				pointer new_end = pointer();
+				pointer new_end_capacity = pointer();
+				new_start = _alloc.allocate(dist);
+				new_end = new_start;
+				new_end_capacity = new_start + dist;
+				for(; &(*first) != &(*last); first++, new_end++)
+					_alloc.construct(new_end, *first);
+				
+				_alloc.deallocate(_start, this->capacity());
+				_start = new_start;
+				_end = new_end;
+				_end_capacity = new_end_capacity;
+			}
+		}
+
+	void assign (size_type n, const value_type& val)
+	{
+		this->clear();
+		if (n == 0)
+			return ;
+		if (size_type(_end_capacity - _start) >= n)
+		{
+			while (n)
+			{
+				_alloc.construct(_end++ , val);
+				n--;
+			}
+		}
+		else
+		{
+			_alloc.deallocate(_start, this->capacity());
+			_start = _alloc.allocate( n );
+			_end = _start;
+			_end_capacity = _start + n;
+			while (n)
+			{
+				_alloc.construct(_end++, val);
+				n--;
+			}
+		}
+	}
 
 //**********************************************
     public: // get_alloc swap relations_operator
@@ -510,8 +500,8 @@ template <class InputIterator>
 
 // adım 1 ) class yapısını oluştur
 // adım 2 ) boş vektör construct oluştur
-// adım 3 ) capacity fonklarını ekle bu fonksiyonları daha sonrasında kullanacağız
-// adım 4 ) push_back ve pop_back ekle
+// adım 3 ) push_back ve pop_back ekle
+// adım 4 ) capacity fonklarını ekle bu fonksiyonları daha sonrasında kullanacağız
 // adım 5 ) kontrol amaçlı [] ekle
 // adım 6 ) testlerini gerçekleştir
 // adım 7 ) element acces fonksiyonlarını koduna ekle gerekli olursa utils.hpp yap ve gerekli fonkları ekle

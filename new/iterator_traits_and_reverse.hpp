@@ -36,8 +36,6 @@ namespace ft
         typedef std::random_access_iterator_tag iterator_category;
     };
 
-    
-    
     // Class Decloration
     template <typename It>
     class reverse_iterator

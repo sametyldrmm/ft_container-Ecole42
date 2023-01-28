@@ -1,30 +1,10 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   tester_vector.cpp                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: samet <samet@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/27 17:54:42 by rchallie          #+#    #+#             */
-/*   Updated: 2022/11/24 00:02:22 by samet            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 # include <vector>
 # include <fstream>
 # include <string>
-
 # include "vector.hpp"
 // # include "../containers/utils/random_access_iterator.hpp"
 # include "tester.hpp"
-bool printBoolResult(std::fstream& fs, bool stl_bool, bool ft_bool)
-{
-    fs << "\nBool result : \n";
-    fs << " - STL : " << (stl_bool ? "true" : "false") << std::endl;
-    fs << " - FT  : " << (ft_bool ? "true" : "false") << std::endl;
 
-    return (stl_bool == ft_bool);
-}
 template <class T>
 std::string equalContent(
     const std::vector<T> & stl_vector,

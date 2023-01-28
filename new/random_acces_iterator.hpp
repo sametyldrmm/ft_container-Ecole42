@@ -135,8 +135,6 @@ namespace ft
     operator+(typename random_access_iterator<It, Container>::difference_type n,const random_access_iterator<It, Container> &it)
     {    return random_access_iterator<It, Container>(it.base() + n);}
 
-
-    
 } // namespace ft
 
 #endif
